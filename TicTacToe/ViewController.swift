@@ -24,6 +24,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var c1: UIButton!
     @IBOutlet weak var c2: UIButton!
     @IBOutlet weak var c3: UIButton!
+    @IBOutlet weak var xsScoreValue: UILabel!
+    @IBOutlet weak var osScoreValue: UILabel!
     
     // first turn gets Xs
     var firstTurn = Turn.X
@@ -58,10 +60,12 @@ class ViewController: UIViewController {
         
         if (checkForWin(EX)) {
             xsScore += 1
+            updateScoreBoard()
             resultAlert(title: "Xs Win!")
         }
         if (checkForWin(OH)) {
             osScore += 1
+            updateScoreBoard()
             resultAlert(title: "Os Win!")
         }
         
@@ -134,6 +138,17 @@ class ViewController: UIViewController {
                 turnLabel.text = OH
             }
             sender.isEnabled = false // disable use of button after it has been set
+        }
+    }
+    
+    func updateScoreBoard() {
+        xsScoreValue.text = String(xsScore)
+        osScoreValue.text = String(osScore)
+        if (xsScore > osScore) { // make xs score label text bold
+            
+        }
+        if (osScore > xsScore) { // make os score label bold
+            
         }
     }
     
