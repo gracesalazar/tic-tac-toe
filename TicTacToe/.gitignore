@@ -1,0 +1,4 @@
+xcuserdata/
+build/
+*.plist   # Ignores all .plist files
+*.DS_Store
