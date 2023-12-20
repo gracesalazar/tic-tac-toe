@@ -41,6 +41,13 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         initBoard()
+        startNewRound()
+    }
+    
+    func startNewRound() { // deal with the alternating first turns
+        if currentTurn == Turn.O { // if AI's turn, make move
+            aiMove()
+        }
     }
     
     func initBoard() {
@@ -56,8 +63,11 @@ class ViewController: UIViewController {
     }
     
     @IBAction func boardTapAction(_ sender: UIButton) {
-        addToBoard(sender)
-        
+        addToBoard(sender) // add user's move to board
+        if (!checkGameStatus()) { // check game status
+            aiMove() // then AI
+        }
+        // check for wins or draw
         if (checkForWin(EX)) {
             xsScore += 1
             updateScoreBoard()
@@ -68,11 +78,37 @@ class ViewController: UIViewController {
             updateScoreBoard()
             resultAlert(title: "Os Win!")
         }
-        
         if (fullBoard()) {
             resultAlert(title: "Draw")
         }
-        
+    }
+    
+    func aiMove() { // randomly chooses a move from set of available (nil) squares on board
+        var availableButtons = [UIButton]()
+        for button in board {
+            if button.title(for: .normal) == nil {
+                availableButtons.append(button)
+            }
+        }
+        if !availableButtons.isEmpty { // if there are any available buttons, choose one randomly
+            let randomIndex = Int(arc4random_uniform(UInt32(availableButtons.count)))
+            let button = availableButtons[randomIndex]
+            addToBoard(button)
+        }
+    }
+    
+    // returns true if game is over, else returns false if game is still going
+    func checkGameStatus() -> Bool {
+        if (checkForWin(EX)) {
+            return true
+        }
+        if (checkForWin(OH)) {
+            return true
+        }
+        if (fullBoard()) {
+            return true
+        }
+        return false
     }
     
     func checkForWin(_ s :String) -> Bool {
@@ -105,6 +141,7 @@ class ViewController: UIViewController {
             button.setTitle(nil, for: .normal)
             button.isEnabled = true // enable use of buttons again
         }
+        // alternating first turns
         if (firstTurn == Turn.O) {
             firstTurn = Turn.X
             turnLabel.text = EX
@@ -113,7 +150,8 @@ class ViewController: UIViewController {
             firstTurn = Turn.O
             turnLabel.text = OH
         }
-        currentTurn = firstTurn
+        currentTurn = firstTurn // set current turn for next round
+        startNewRound() // AI makes first move if it's their turn
     }
     
     func fullBoard() -> Bool {
@@ -127,15 +165,15 @@ class ViewController: UIViewController {
     
     func addToBoard(_ sender: UIButton) {
         if (sender.title(for: .normal) == nil) {
-            if (currentTurn == Turn.O) {
-                sender.setTitle(OH, for: .normal)
-                currentTurn = Turn.X
-                turnLabel.text = EX
-            }
-            else if (currentTurn == Turn.X) {
+            if (currentTurn == Turn.X) {
                 sender.setTitle(EX, for: .normal)
                 currentTurn = Turn.O
                 turnLabel.text = OH
+            }
+            else if (currentTurn == Turn.O) {
+                sender.setTitle(OH, for: .normal)
+                currentTurn = Turn.X
+                turnLabel.text = EX
             }
             sender.isEnabled = false // disable use of button after it has been set
         }
@@ -144,12 +182,13 @@ class ViewController: UIViewController {
     func updateScoreBoard() {
         xsScoreValue.text = String(xsScore)
         osScoreValue.text = String(osScore)
-        if (xsScore > osScore) { // make xs score label text bold
-            
-        }
-        if (osScore > xsScore) { // make os score label bold
-            
-        }
+        //TODO: bold score text on scoreboard for current winner
+//        if (xsScore > osScore) { // make xs score label text bold
+//
+//        }
+//        if (osScore > xsScore) { // make os score label bold
+//
+//        }
     }
     
 }
